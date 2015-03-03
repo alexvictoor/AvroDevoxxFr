@@ -5,7 +5,7 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>avro alt net</title>
+		<title>Avro DevoxxFr</title>
 
 		<link rel="stylesheet" href = "css/bootstrap.css">
 	
@@ -79,7 +79,7 @@
 						<code data-trim>
 							{
     "type":"record",
-    "namespace": "Alt.Net.Example",
+    "namespace": "DevoxxFR.Example",
     "name":"Deal",
     "fields":
         [
@@ -97,7 +97,7 @@
 						<code data-trim>
 {
     "type":"record",
-    "namespace": "Alt.Net.Example",
+    "namespace": "DevoxxFR.Example",
     "name":"Deal",
     "fields":
         [
@@ -109,7 +109,7 @@
                 "type":
                     ["null", {
                         "type":"record",
-                        "namespace":"Alt.Net.Example",
+                        "namespace":"DevoxxFR.Example",
                         "name":"Product",
                         "default":null,
                         "fields":
@@ -133,50 +133,72 @@
 					<!-- todo ligne de commande avro tool -->
 					<pre>
 						<code data-trim>
-							>Microsoft.Hadoop.Avro.Tools codegen /i:Deal.avsc /o:.
+							java -jar avro-tools.jar compile schema trade.avro
 						</code>
 					</pre>
 				</section>
 
-				<section>
-					<pre>
-						<code data-trim>
-[DataContract(Name = "Deal", Namespace = "Alt.Net.Example")]
-internal class DealData
-{
-    [DataMember(Name = "ClientId")]
-    public int Client { get; set; }
-
-    [DataMember(Name = "Nominal")]
-    public double Nominal { get; set; }
-
-    [DataMember(Name = "Date")]
-    public string Date { get; set; }
-}						
-    </code>
-					</pre>
-
-
-				</section>
+			
 
 				<section>
 					<h1>Avec un seul object</h1>
 					<pre>
 						<code data-trim>
-var serializer = AvroSerializer.Create&lt;Deal&gt;();
+DatumWriter&lt;Trade&gt; writer = new SpecificDatumWriter&lt;Trade&gt;();
 						</code>
 					</pre>
 					<pre class="fragment">
 						<code data-trim>
-serializer.Serialize(stream, deal);
+encoder = EncoderFactory.get().binaryEncoder(outputStream, null);
 						</code>
 					</pre>
 					<pre class="fragment">
 						<code data-trim>
-var deal = serializer.Deserialize(stream);
+writer.write(trade, encoder);
 						</code>
 					</pre>
 				</section>
+
+				<section>
+					<h1>Puis pour lire</h1>
+					<pre>
+						<code data-trim>
+DatumReader&lt;Trade&gt; reader = new SpecificDatumReader&lt;Trade&gt;();
+						</code>
+					</pre>
+					<pre class="fragment">
+						<code data-trim>
+decoder = DecoderFactory.get().binaryDecoder(inputStream, null);
+						</code>
+					</pre>
+					<pre class="fragment">
+						<code data-trim>
+trade = reader.read(null, decoder);
+						</code>
+					</pre>
+				</section>
+
+				<section>
+					<h1>Sans génération</h1>
+					<pre>
+						<code data-trim>
+GenericRecord record = new GenericData.Record(SCHEMA);
+record.put("ProductId", 123);
+record.put("Nominal", 42000);
+						</code>
+					</pre>
+					<pre class="fragment">
+						<code data-trim>
+DatumWriter&lt;GenericRecord&gt; datumWriter = new GenericDatumWriter&lt;&gt;(SCHEMA);
+						</code>
+					</pre>
+					<pre class="fragment">
+						<code data-trim>
+DatumReader&lt;GenericRecord&gt; datumReader = new GenericDatumReader&lt;&gt;(SCHEMA);
+						</code>
+					</pre>
+				</section>
+
 
 				<section data-transition="fade">
 					<h1>Ecrire en masse</h1>
@@ -187,8 +209,7 @@ var deal = serializer.Deserialize(stream);
 					<h1>Ecrire en masse</h1>
 					<pre>
 						<code data-trim>
-using (var stream = new FileStream(path, OpenOrCreate, Write))
-{
+File avroDataFile = ... // on peut aussi utiliser un OutputStream
 
 
 
@@ -196,7 +217,7 @@ using (var stream = new FileStream(path, OpenOrCreate, Write))
 
 
 
-}
+ &nbsp;
 						</code>
 					</pre>
 				</section>
@@ -204,16 +225,14 @@ using (var stream = new FileStream(path, OpenOrCreate, Write))
 					<h1>Ecrire en masse</h1>
 					<pre>
 						<code data-trim>
-using (var stream = new FileStream(path, OpenOrCreate, Write))
-{
-  using (var cw = AvroContainer.CreateWriter&lt;Deal&gt;(stream, Codec.Deflate))
-  {
+File avroDataFile = ... // on peut aussi utiliser un OutputStream
+DataFileWriter&lt;GenericRecord&gt; dataFileWriter 
+     = new DataFileWriter&lt;&gt;(datumWriter);
+dataFileWriter.setCodec(CodecFactory.snappyCodec());
+dataFileWriter.create(TRADE_SCHEMA, avroDataFile); 
 
 
-
-
-  }
-}
+&nbsp;
 						</code>
 					</pre>
 				</section>
@@ -221,15 +240,13 @@ using (var stream = new FileStream(path, OpenOrCreate, Write))
 					<h1>Ecrire en masse</h1>
 					<pre>
 						<code data-trim>
-using (var stream = new FileStream(path, OpenOrCreate, Write))
-{
-  using (var cw = AvroContainer.CreateWriter&lt;Deal&gt;(stream, Codec.Deflate))
-  {
-    using (var w = new SequentialWriter&lt;Deal&gt;(cw, 100))
-    {
-      deals.ForEach(w.Write);
-    }
-  }
+File avroDataFile = ... // on peut aussi utiliser un OutputStream
+DataFileWriter&lt;GenericRecord&gt; dataFileWriter 
+     = new DataFileWriter&lt;&gt;(datumWriter);
+dataFileWriter.setCodec(CodecFactory.snappyCodec());
+dataFileWriter.create(TRADE_SCHEMA, avroDataFile); 
+for (GenericRecord record : records) {
+	dataFileWriter.append(record);
 }
 						</code>
 					</pre>
@@ -244,17 +261,14 @@ using (var stream = new FileStream(path, OpenOrCreate, Write))
 					<h1>Et pour lire ?</h1>
 					<pre class="fragment">
 						<code data-trim>
-using (var reader = AvroContainer.CreateGenericReader(stream))
-{
+File avroDataFile = ... // on peut aussi utiliser un OutputStream							
 
 
 
 
 
 
-
-
-}
+&nbsp;
 </code>
 					</pre>
 				</section>	
@@ -263,17 +277,14 @@ using (var reader = AvroContainer.CreateGenericReader(stream))
 					<h1>Et pour lire ?</h1>
 					<pre>
 						<code data-trim>
-using (var reader = AvroContainer.CreateGenericReader(stream))
-{
-  using (var streamReader = new SequentialReader&lt;dynamic&gt;(reader))
-  {
+File avroDataFile = ... // on peut aussi utiliser un OutputStream							
+DatumReader&lt;GenericRecord&gt; datumReader = new GenericDatumReader&lt;&gt;();
 
 
 
 
 
-  }
-}
+&nbsp;
 </code>
 					</pre>
 				</section>	
@@ -282,16 +293,30 @@ using (var reader = AvroContainer.CreateGenericReader(stream))
 					<h1>Et pour lire ?</h1>
 					<pre>
 						<code data-trim>
-using (var reader = AvroContainer.CreateGenericReader(stream))
-{
-  using (var streamReader = new SequentialReader&lt;dynamic&gt;(reader))
-  {
-    IEnumerable&lt;dynamic&gt; deals = streamReader.Objects;    
-    foreach (var deal in deals)
-    {
-      // ...
-    }
-  }
+File avroDataFile = ... // on peut aussi utiliser un OutputStream							
+DatumReader&lt;GenericRecord&gt; datumReader = new GenericDatumReader&lt;&gt;();
+DataFileReader&lt;GenericRecord&gt; dataFileReader 
+    = new DataFileReader(avroDataFile, datumReader);
+
+
+
+&nbsp;
+</code>
+					</pre>
+				</section>	
+
+
+				<section data-transition="fade">
+					<h1>Et pour lire ?</h1>
+					<pre>
+						<code data-trim>
+File avroDataFile = ... // on peut aussi utiliser un OutputStream							
+DatumReader&lt;GenericRecord&gt; datumReader = new GenericDatumReader&lt;&gt;();
+DataFileReader&lt;GenericRecord&gt; dataFileReader 
+    = new DataFileReader(avroDataFile, datumReader);
+
+for (GenericRecord record : dataFileReader) {
+	// ...
 }
 </code>
 					</pre>
@@ -309,7 +334,7 @@ using (var reader = AvroContainer.CreateGenericReader(stream))
 						<code data-trim>
 {
     "type":"record",
-    "namespace": "Alt.Net.Example",
+    "namespace": "DevoxxFR.Example",
     "name":"Deal",
     "fields":
         [
@@ -321,7 +346,7 @@ using (var reader = AvroContainer.CreateGenericReader(stream))
                 "type":
                     ["null", {
                         "type":"record",
-                        "namespace": "Alt.Net.Example",
+                        "namespace": "DevoxxFR.Example",
                         "name":"Product",
 						"default":null,
                         "fields":
@@ -345,7 +370,7 @@ using (var reader = AvroContainer.CreateGenericReader(stream))
 					<pre>
 						<code data-trim>
 // la résolution de schema
-AvroSerializer.CreateGenericDeserializerOnly(writerSchema, readerSchema)
+new GenericDatumReader(writerSchema, readerSchema)
 	</code>
 </pre>
 <div class='fragment' style="text-align: left;">
@@ -360,7 +385,7 @@ AvroSerializer.CreateGenericDeserializerOnly(writerSchema, readerSchema)
 					<pre>
 						<code data-trim>
 // la résolution de schema
-AvroSerializer.CreateGenericDeserializerOnly(writerSchema, readerSchema)
+new GenericDatumReader(writerSchema, readerSchema)
 	</code>
 </pre>
 
