@@ -1,0 +1,458 @@
+
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>avro alt net</title>
+
+		<link rel="stylesheet" href = "css/bootstrap.css">
+	
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Avro</h1>
+					<h3>la puissance du binaire, la souplesse du JSON</h3>
+					<p><img src="avro-logo.png" /></p>
+				</section>
+
+				<section>
+					<h1>MYSELF</h1>
+					<p style="text-align: left;">
+						Alexandre Victoor<br/>
+						Architecte à la SGCIB<br/>
+						alexvictoor@gmail.com<br/>
+						https://github.com/alexvictoor<br/>
+						@alex_victoor
+					</p>
+
+				</section>
+
+				<section data-background-transition="fade" data-background="white">
+					
+					<img src="hadoop-elephant.png" />
+				</section>
+				<section data-background-transition="fade" data-background="#00abec">
+					<!-- sldie interop, todo logo java et python -->
+					<img src="microsoft.png"  />
+					<p style="background-color: black">Install-Package Microsoft.Hadoop.Avro</p>
+				</section>
+
+				<section data-background-transition="fade" data-background="white">
+					
+					<img src="largefile.jpg" />
+				</section>
+
+				<section>
+					<h1>Un fichier avro</h1>
+					<img src="avrofile.png" style="border: 0px" />
+				</section>
+<section>
+				<section>
+					<pre>
+						<code data-trim>
+							{
+    "type":"record",
+    "namespace": "Alt.Net.Example",
+    "name":"Deal",
+    "fields":
+        [
+            { "name":"ClientId", "type":"int" },
+            { "name":"Nominal", "type":"double" },
+            { "name":"Date", "type":"string" }
+        ]
+}
+						</code>
+					</pre>
+				</section>
+
+<section>
+					<pre>
+						<code data-trim>
+{
+    "type":"record",
+    "namespace": "Alt.Net.Example",
+    "name":"Deal",
+    "fields":
+        [
+            { "name":"ClientId", "type":"int" },
+            { "name":"Nominal", "type":"double" },
+            { "name":"Date", "type":"string" },                                        
+            {
+                "name":"product",    
+                "type":
+                    ["null", {
+                        "type":"record",
+                        "namespace":"Alt.Net.Example",
+                        "name":"Product",
+                        "default":null,
+                        "fields":
+                            [
+                                { "name":"underlying", "type":"string" },
+                                { "name":"currency", "type": {
+                                    "name":"Currency", "type":"enum", "symbols": ["USD", "EUR", "GBP"] } 
+                                },                                        
+                                { "name":"maturity", "type":"string" }
+                            ]
+                    }]
+            }            
+        ]
+}
+						</code>
+					</pre>
+				</section>
+</section>
+				<section>
+					<img src="schemadt.png" style="border: 0px" />
+					<!-- todo ligne de commande avro tool -->
+					<pre>
+						<code data-trim>
+							>Microsoft.Hadoop.Avro.Tools codegen /i:Deal.avsc /o:.
+						</code>
+					</pre>
+				</section>
+
+				<section>
+					<pre>
+						<code data-trim>
+[DataContract(Name = "Deal", Namespace = "Alt.Net.Example")]
+internal class DealData
+{
+    [DataMember(Name = "ClientId")]
+    public int Client { get; set; }
+
+    [DataMember(Name = "Nominal")]
+    public double Nominal { get; set; }
+
+    [DataMember(Name = "Date")]
+    public string Date { get; set; }
+}						
+    </code>
+					</pre>
+
+
+				</section>
+
+				<section>
+					<h1>Avec un seul object</h1>
+					<pre>
+						<code data-trim>
+var serializer = AvroSerializer.Create&lt;Deal&gt;();
+						</code>
+					</pre>
+					<pre class="fragment">
+						<code data-trim>
+serializer.Serialize(stream, deal);
+						</code>
+					</pre>
+					<pre class="fragment">
+						<code data-trim>
+var deal = serializer.Deserialize(stream);
+						</code>
+					</pre>
+				</section>
+
+				<section data-transition="fade">
+					<h1>Ecrire en masse</h1>
+					<img src="dcbin.png" style="border: 0px" />
+				</section>
+
+				<section data-transition="fade">
+					<h1>Ecrire en masse</h1>
+					<pre>
+						<code data-trim>
+using (var stream = new FileStream(path, OpenOrCreate, Write))
+{
+
+
+
+
+
+
+
+}
+						</code>
+					</pre>
+				</section>
+<section data-transition="fade">
+					<h1>Ecrire en masse</h1>
+					<pre>
+						<code data-trim>
+using (var stream = new FileStream(path, OpenOrCreate, Write))
+{
+  using (var cw = AvroContainer.CreateWriter&lt;Deal&gt;(stream, Codec.Deflate))
+  {
+
+
+
+
+  }
+}
+						</code>
+					</pre>
+				</section>
+<section data-transition="fade">
+					<h1>Ecrire en masse</h1>
+					<pre>
+						<code data-trim>
+using (var stream = new FileStream(path, OpenOrCreate, Write))
+{
+  using (var cw = AvroContainer.CreateWriter&lt;Deal&gt;(stream, Codec.Deflate))
+  {
+    using (var w = new SequentialWriter&lt;Deal&gt;(cw, 100))
+    {
+      deals.ForEach(w.Write);
+    }
+  }
+}
+						</code>
+					</pre>
+				</section>	
+
+				<section data-transition="fade">
+					<h1>Et pour lire ?</h1>
+					<img src="bindyn.png" style="border: 0px" />	
+				</section>
+
+				<section data-transition="fade">
+					<h1>Et pour lire ?</h1>
+					<pre class="fragment">
+						<code data-trim>
+using (var reader = AvroContainer.CreateGenericReader(stream))
+{
+
+
+
+
+
+
+
+
+}
+</code>
+					</pre>
+				</section>	
+
+				<section data-transition="fade">
+					<h1>Et pour lire ?</h1>
+					<pre>
+						<code data-trim>
+using (var reader = AvroContainer.CreateGenericReader(stream))
+{
+  using (var streamReader = new SequentialReader&lt;dynamic&gt;(reader))
+  {
+
+
+
+
+
+  }
+}
+</code>
+					</pre>
+				</section>	
+
+				<section data-transition="fade">
+					<h1>Et pour lire ?</h1>
+					<pre>
+						<code data-trim>
+using (var reader = AvroContainer.CreateGenericReader(stream))
+{
+  using (var streamReader = new SequentialReader&lt;dynamic&gt;(reader))
+  {
+    IEnumerable&lt;dynamic&gt; deals = streamReader.Objects;    
+    foreach (var deal in deals)
+    {
+      // ...
+    }
+  }
+}
+</code>
+					</pre>
+				</section>	
+
+<section>
+	
+	<h1>C'est bien mais...</h1>
+	<img src="cartoobig.jpg" class="fragment"/>
+
+</section>
+
+<section>
+					<pre>
+						<code data-trim>
+{
+    "type":"record",
+    "namespace": "Alt.Net.Example",
+    "name":"Deal",
+    "fields":
+        [
+            { "name":"ClientId", "type":"int" },
+            { "name":"Nominal", "type":"double" },
+            { "name":"Date", "type":"string" },                                        
+            {
+                "name":"product",    
+                "type":
+                    ["null", {
+                        "type":"record",
+                        "namespace": "Alt.Net.Example",
+                        "name":"Product",
+						"default":null,
+                        "fields":
+                            [
+                                { "name":"underlying", "type":"string" },
+                                { "name":"currency", "type": {
+                                    "name":"Currency", "type":"enum", "symbols": ["USD", "EUR", "GBP"] } 
+                                },                                        
+                                { "name":"maturity", "type":"string" }
+                            ]
+                    }]
+            }            
+        ]
+}
+						</code>
+					</pre>
+				</section>
+
+<section data-transition="fade">
+	<h1>La killer feature</h1>
+					<pre>
+						<code data-trim>
+// la résolution de schema
+AvroSerializer.CreateGenericDeserializerOnly(writerSchema, readerSchema)
+	</code>
+</pre>
+<div class='fragment' style="text-align: left;">
+  Writer Schema<br>
+  Le schéma qui a été utilisé pour sérialiser
+   
+   
+</div>
+</section>
+<section data-transition="fade">
+<h1>La killer feature</h1>
+					<pre>
+						<code data-trim>
+// la résolution de schema
+AvroSerializer.CreateGenericDeserializerOnly(writerSchema, readerSchema)
+	</code>
+</pre>
+
+<div style="text-align: right;">
+  Reader Schema<br>  
+  Les données dont vous avez besoin
+  
+</div>
+
+</section>	
+<section style="text-align: left;">
+	<h2>Entre 2 schemas, on peut</h2>
+	<p>
+		- ajouter un champ<br/>
+		- supprimer un champ<br/>
+		- renomer un champ (avec un alias)<br/>
+		
+	</p>
+	<p class="fragment">On ne peut pas changer le type d'un champ</p>
+</section>
+<section style="text-align: left;">
+	<h1>D'autres usages</h1>
+	<p>
+		- Echanges entre applications
+	</p>
+	<p class="fragment">
+		- Event sourcing
+	</p>
+</section>
+
+<section data-transition="fade">
+	<h1>Event Sourcing</h1>
+	<img src="event-sourcing.png" style="border: 0px" />
+</section>
+
+<section data-transition="fade">
+	<h1>Event Sourcing</h1>
+	<img src="event-sourcing2.png" style="border: 0px" />
+</section>
+
+<section>
+	<img src="silver-bullets.jpg" style="border: 0px" />
+</section>
+
+<section>
+	<section>
+	<h1>Questions ?</h1>
+	</section>
+	<section>
+		<h1>Ressources</h1>
+		<p style="text-align: left;">
+		Ces slides: <br/><a>https://github.com/alexvictoor/AvroAltNet</a> <br/>
+		Le tuto MS: <br/><a>http://bit.ly/1uYRX3I</a><br/>
+		Le SDK MS Hadoop:<br/><a>http://hadoopsdk.codeplex.com/SourceControl/latest</a><br/>
+		La spec avro: <br/><a>http://avro.apache.org/docs/1.7.7/spec.html</a><br/> 
+	</p>
+	</section>
+
+</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+		
+	</body>
+</html>
