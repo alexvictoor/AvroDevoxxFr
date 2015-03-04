@@ -129,7 +129,7 @@
 				</section>
 </section>
 				<section>
-					<img src="schemadt.png" style="border: 0px" />
+					<img src="schemaclass.png" style="border: 0px" />
 					<!-- todo ligne de commande avro tool -->
 					<pre>
 						<code data-trim>
@@ -202,14 +202,19 @@ DatumReader&lt;GenericRecord&gt; datumReader = new GenericDatumReader&lt;&gt;(SC
 
 				<section data-transition="fade">
 					<h1>Ecrire en masse</h1>
-					<img src="dcbin.png" style="border: 0px" />
+					<img src="recordbin.png" style="border: 0px" />
 				</section>
 
 				<section data-transition="fade">
 					<h1>Ecrire en masse</h1>
 					<pre>
 						<code data-trim>
-File avroDataFile = ... // on peut aussi utiliser un OutputStream
+File avroDataFile; // on peut aussi utiliser un OutputStream
+
+
+
+
+
 
 
 
@@ -225,11 +230,84 @@ File avroDataFile = ... // on peut aussi utiliser un OutputStream
 					<h1>Ecrire en masse</h1>
 					<pre>
 						<code data-trim>
-File avroDataFile = ... // on peut aussi utiliser un OutputStream
+File avroDataFile; // on peut aussi utiliser un OutputStream
+
+DatumWriter&lt;GenericRecord&gt; datumWriter = new GenericDatumWriter&lt;&gt;();
+
+
+
+
+
+
+
+
+
+
+&nbsp;
+						</code>
+					</pre>
+				</section>
+
+<section data-transition="fade">
+					<h1>Ecrire en masse</h1>
+					<pre>
+						<code data-trim>
+File avroDataFile; // on peut aussi utiliser un OutputStream
+
+DatumWriter&lt;GenericRecord&gt; datumWriter = new GenericDatumWriter&lt;&gt;();
+
 DataFileWriter&lt;GenericRecord&gt; dataFileWriter 
      = new DataFileWriter&lt;&gt;(datumWriter);
+
+
+
+
+
+
+
+&nbsp;
+						</code>
+					</pre>
+				</section>
+
+
+<section data-transition="fade">
+					<h1>Ecrire en masse</h1>
+					<pre>
+						<code data-trim>
+File avroDataFile; // on peut aussi utiliser un OutputStream
+
+DatumWriter&lt;GenericRecord&gt; datumWriter = new GenericDatumWriter&lt;&gt;();
+
+DataFileWriter&lt;GenericRecord&gt; dataFileWriter 
+     = new DataFileWriter&lt;&gt;(datumWriter);
+
 dataFileWriter.setCodec(CodecFactory.snappyCodec());
+
+
+
+
+
+&nbsp;
+						</code>
+					</pre>
+				</section>
+
+<section data-transition="fade">
+					<h1>Ecrire en masse</h1>
+					<pre>
+						<code data-trim>
+File avroDataFile; // on peut aussi utiliser un OutputStream
+
+DatumWriter&lt;GenericRecord&gt; datumWriter = new GenericDatumWriter&lt;&gt;();
+
+DataFileWriter&lt;GenericRecord&gt; dataFileWriter 
+     = new DataFileWriter&lt;&gt;(datumWriter);
+
+dataFileWriter.setCodec(CodecFactory.snappyCodec());
+
 dataFileWriter.create(TRADE_SCHEMA, avroDataFile); 
+
 
 
 &nbsp;
@@ -240,11 +318,17 @@ dataFileWriter.create(TRADE_SCHEMA, avroDataFile);
 					<h1>Ecrire en masse</h1>
 					<pre>
 						<code data-trim>
-File avroDataFile = ... // on peut aussi utiliser un OutputStream
+File avroDataFile; // on peut aussi utiliser un OutputStream
+
+DatumWriter&lt;GenericRecord&gt; datumWriter = new GenericDatumWriter&lt;&gt;();
+
 DataFileWriter&lt;GenericRecord&gt; dataFileWriter 
      = new DataFileWriter&lt;&gt;(datumWriter);
+
 dataFileWriter.setCodec(CodecFactory.snappyCodec());
-dataFileWriter.create(TRADE_SCHEMA, avroDataFile); 
+
+dataFileWriter.create(TRADE_SCHEMA, avroDataFile);
+
 for (GenericRecord record : records) {
 	dataFileWriter.append(record);
 }
@@ -254,14 +338,34 @@ for (GenericRecord record : records) {
 
 				<section data-transition="fade">
 					<h1>Et pour lire ?</h1>
-					<img src="bindyn.png" style="border: 0px" />	
+					<img src="binrecord.png" style="border: 0px" />	
 				</section>
 
 				<section data-transition="fade">
 					<h1>Et pour lire ?</h1>
 					<pre class="fragment">
 						<code data-trim>
-File avroDataFile = ... // on peut aussi utiliser un OutputStream							
+File avroDataFile; // on peut aussi utiliser un InputStream
+
+
+
+
+
+
+
+
+&nbsp;
+</code>
+					</pre>
+				</section>	
+
+				<section data-transition="fade">
+					<h1>Et pour lire ?</h1>
+					<pre>
+						<code data-trim>
+File avroDataFile; // on peut aussi utiliser un InputStream
+
+DatumReader&lt;GenericRecord&gt; datumReader = new GenericDatumReader&lt;&gt;();
 
 
 
@@ -277,24 +381,10 @@ File avroDataFile = ... // on peut aussi utiliser un OutputStream
 					<h1>Et pour lire ?</h1>
 					<pre>
 						<code data-trim>
-File avroDataFile = ... // on peut aussi utiliser un OutputStream							
+File avroDataFile; // on peut aussi utiliser un InputStream
+
 DatumReader&lt;GenericRecord&gt; datumReader = new GenericDatumReader&lt;&gt;();
 
-
-
-
-
-&nbsp;
-</code>
-					</pre>
-				</section>	
-
-				<section data-transition="fade">
-					<h1>Et pour lire ?</h1>
-					<pre>
-						<code data-trim>
-File avroDataFile = ... // on peut aussi utiliser un OutputStream							
-DatumReader&lt;GenericRecord&gt; datumReader = new GenericDatumReader&lt;&gt;();
 DataFileReader&lt;GenericRecord&gt; dataFileReader 
     = new DataFileReader(avroDataFile, datumReader);
 
@@ -310,13 +400,15 @@ DataFileReader&lt;GenericRecord&gt; dataFileReader
 					<h1>Et pour lire ?</h1>
 					<pre>
 						<code data-trim>
-File avroDataFile = ... // on peut aussi utiliser un OutputStream							
+File avroDataFile; // on peut aussi utiliser un InputStream
+
 DatumReader&lt;GenericRecord&gt; datumReader = new GenericDatumReader&lt;&gt;();
+
 DataFileReader&lt;GenericRecord&gt; dataFileReader 
     = new DataFileReader(avroDataFile, datumReader);
 
 for (GenericRecord record : dataFileReader) {
-	// ...
+	// traitement sur chaque record
 }
 </code>
 					</pre>
@@ -427,6 +519,12 @@ new GenericDatumReader(writerSchema, readerSchema)
 </section>
 
 <section>
+	<h1>Demo</h1>
+	<img src="demo.png" />
+
+</section>	
+
+<section>
 	<img src="silver-bullets.jpg" style="border: 0px" />
 </section>
 
@@ -435,9 +533,9 @@ new GenericDatumReader(writerSchema, readerSchema)
 	<h1>Questions ?</h1>
 	</section>
 	<section>
-		<h1>Ressources</h1>
+		<h1>Ressources - TBD</h1>
 		<p style="text-align: left;">
-		Ces slides: <br/><a>https://github.com/alexvictoor/AvroAltNet</a> <br/>
+		Ces slides: <br/><a>https://github.com/alexvictoor/AvroDevoxxFr</a> <br/>
 		Le tuto MS: <br/><a>http://bit.ly/1uYRX3I</a><br/>
 		Le SDK MS Hadoop:<br/><a>http://hadoopsdk.codeplex.com/SourceControl/latest</a><br/>
 		La spec avro: <br/><a>http://avro.apache.org/docs/1.7.7/spec.html</a><br/> 
