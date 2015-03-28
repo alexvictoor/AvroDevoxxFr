@@ -56,7 +56,7 @@ namespace AvroDotNetDemo
                         var msg = socket.Receive();
                         var stream = new MemoryStream(msg);
                         var trade = deserializer.Deserialize(stream);
-                        Console.Out.WriteLine("trade [ ProductId = {0}, Nominal = {1}, Date = {2}, Trading Place = {3} ]", trade.ProductId, trade.Nominal, trade.Date, trade.TradingPlace);
+                        Console.Out.WriteLine("trade [ ProductId = {0}, Trading Place = {1}, Nominal = {2}, Date = {3} ]", trade.ProductId, trade.TradingPlace, trade.Nominal, trade.Date);
                
                     }    
                                        

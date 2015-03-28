@@ -31,7 +31,7 @@ public class Trade {
 
     public static Trade createRandom() {
         int productId = counter++;
-        int quantity = Math.abs(random.nextInt());
+        int quantity = Math.abs(random.nextInt(100));
         double nominal = Math.abs(random.nextDouble()) * 1000000D;
         return new Trade(productId, quantity, nominal, new Date());
     }

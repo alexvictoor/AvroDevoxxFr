@@ -2,7 +2,6 @@ package com.github.alexvictoor;
 
 import com.google.common.base.Throwables;
 import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaCompatibility;
 import org.apache.avro.SchemaParseException;
 import org.zeromq.ZContext;
@@ -13,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.apache.avro.SchemaCompatibility.SchemaCompatibilityType;
 import static org.apache.avro.SchemaCompatibility.SchemaCompatibilityType.COMPATIBLE;
-import static org.apache.avro.SchemaCompatibility.SchemaCompatibilityType.INCOMPATIBLE;
 
 /**
  * Hello world!
@@ -33,24 +31,25 @@ public class TradeProvider
             "            { \"name\":\"Date\", \"type\":\"string\" }\n" +
             "        ]\n" +
             "}");
-    public static final String TRADE_SCHEMA_JSON = TRADE_SCHEMA.toString(true);
+    public static final String TRADE_SCHEMA_JSON = TRADE_SCHEMA.toString();
     private TradeSerializer serializer = new TradeSerializer();
-    private Schema.Parser schemaParser;
     private ZMQ.Socket schemaSocket;
     private ZMQ.Socket tradeSocket;
+    private boolean needToPublishTrades = false;
 
     private void handleSchemaRequest(String schemaRequest) {
         String response;
         try {
             Schema schema = new Schema.Parser().parse(schemaRequest);
-            System.out.println("Connection request using schema: " + schema.toString(true));
-            System.out.println("Checking compatibility with schema: " + TRADE_SCHEMA_JSON);
+            System.out.println("Connection request using schema: " + schema);
+            System.out.println("Checking compatibility with schema: " + TRADE_SCHEMA);
             SchemaCompatibilityType compatibilityType
                     = SchemaCompatibility.checkReaderWriterCompatibility(schema, TRADE_SCHEMA).getType();
 
             if (compatibilityType == COMPATIBLE) {
                 System.out.println("Schemas are compatible!");
                 response = TRADE_SCHEMA_JSON;
+                needToPublishTrades = true;
             } else {
                 System.out.println("Schemas are not compatible!");
                 response = "ERROR\nSchemas are incompatible";
@@ -76,18 +75,16 @@ public class TradeProvider
         schemaSocket.setReceiveTimeOut(0);
         schemaSocket.bind("tcp://127.0.0.1:8777");
 
-        schemaParser = new Schema.Parser();
-
-        System.out.println("Ready, sending trades!");
+        System.out.println("Waiting for connections!");
         while (true) {
             String schemaRequest = schemaSocket.recvStr();
             if (schemaRequest != null) {
                 handleSchemaRequest(schemaRequest);
             }
-            publishNewTrade();
-            //boolean sendOk = tradeSocket.send("coucou");
-            //System.out.println("send ok " + sendOk);
-            TimeUnit.SECONDS.sleep(1);
+            if (needToPublishTrades) {
+                publishNewTrade();
+            }
+            TimeUnit.SECONDS.sleep(5);
         }
     }
 
@@ -95,7 +92,7 @@ public class TradeProvider
         Trade trade = Trade.createRandom();
         byte[] bytes = serializer.serialize(trade);
         tradeSocket.send(bytes);
-        //System.out.println("Trade sent: " + trade);
+        System.out.println("Trade sent: " + trade);
     }
 
 
