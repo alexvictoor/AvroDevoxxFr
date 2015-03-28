@@ -414,14 +414,9 @@ for (GenericRecord record : dataFileReader) {
 					</pre>
 				</section>	
 
-<section>
-	
-	<h1>C'est bien mais...</h1>
-	<img src="cartoobig.jpg" class="fragment"/>
-
-</section>
 
 <section>
+	<h2>C'est bien mais...</h2>
 					<pre>
 						<code data-trim>
 {
@@ -456,6 +451,11 @@ for (GenericRecord record : dataFileReader) {
 						</code>
 					</pre>
 				</section>
+<section>
+	
+	<img src="cartoobig.jpg" />
+
+</section>
 
 <section data-transition="fade">
 	<h1>La killer feature</h1>
@@ -487,7 +487,8 @@ new GenericDatumReader(writerSchema, readerSchema)
   
 </div>
 
-</section>	
+</section>
+
 <section style="text-align: left;">
 	<h2>Entre 2 schemas, on peut</h2>
 	<p>
@@ -498,7 +499,19 @@ new GenericDatumReader(writerSchema, readerSchema)
 	</p>
 	<p class="fragment">On ne peut pas changer le type d'un champ</p>
 </section>
-<section style="text-align: left;">
+
+<section>
+	<h1>Compatibles ?</h1>
+<pre> 
+	<code data-trim>
+SchemaCompatibility
+  .checkReaderWriterCompatibility(readerSchema, writerSchema)
+	</code>
+</pre>	
+
+</section>
+
+<!--<section style="text-align: left;">
 	<h1>D'autres usages</h1>
 	<p>
 		- Echanges entre applications
@@ -517,7 +530,7 @@ new GenericDatumReader(writerSchema, readerSchema)
 	<h1>Event Sourcing</h1>
 	<img src="event-sourcing2.png" style="border: 0px" />
 </section>
-
+-->
 <section>
 	<h1>Demo</h1>	
 	<div class='span6' style="text-align: left;">
@@ -525,7 +538,7 @@ new GenericDatumReader(writerSchema, readerSchema)
   		<p>
 		
 		productId<br/>
-		quantity<br/>
+		<span style="color: red">quantity</span><br/>
 		nominal<br/>
 		date<br/>
 		
@@ -538,7 +551,7 @@ new GenericDatumReader(writerSchema, readerSchema)
 		productId<br/>
 		nominal<br/>
 		date<br/>
-		tradingPlace<br/>
+		<span style="color: red">tradingPlace</span><br/>
 	</p>
 	</div>
 </section>
@@ -555,23 +568,20 @@ new GenericDatumReader(writerSchema, readerSchema)
 	<img src="sequence-demo-petit-v1.jpg" />
 </section>
 
-<section>
+<!--<section>
 	<img src="silver-bullets.jpg" style="border: 0px" />
 </section>
-
+-->
 <section>
-	<section>
-	<h1>Questions ?</h1>
-	</section>
-	<section>
-		<h1>Ressources - TBD</h1>
+
+		<h1>Ressources</h1>
 		<p style="text-align: left;">
 		Ces slides: <br/><a>https://github.com/alexvictoor/AvroDevoxxFr</a> <br/>
+		La spec avro: <br/><a>http://avro.apache.org/docs/1.7.7/spec.html</a><br/> 
 		Le tuto MS: <br/><a>http://bit.ly/1uYRX3I</a><br/>
 		Le SDK MS Hadoop:<br/><a>http://hadoopsdk.codeplex.com/SourceControl/latest</a><br/>
-		La spec avro: <br/><a>http://avro.apache.org/docs/1.7.7/spec.html</a><br/> 
+		
 	</p>
-	</section>
 
 </section>
 
