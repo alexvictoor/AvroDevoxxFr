@@ -511,13 +511,13 @@ SchemaCompatibility
 
 </section>
 
-<!--<section style="text-align: left;">
+<section style="text-align: left;">
 	<h1>D'autres usages</h1>
 	<p>
-		- Echanges entre applications
-	</p>
-	<p class="fragment">
 		- Event sourcing
+	</p>
+	<p>
+		- Echanges de messages entre applications
 	</p>
 </section>
 
@@ -530,7 +530,7 @@ SchemaCompatibility
 	<h1>Event Sourcing</h1>
 	<img src="event-sourcing2.png" style="border: 0px" />
 </section>
--->
+
 <section>
 	<h1>Demo</h1>	
 	<div class='span6' style="text-align: left;">
@@ -538,7 +538,7 @@ SchemaCompatibility
   		<p>
 		
 		productId<br/>
-		<span style="color: red">quantity</span><br/>
+		quantity<br/>
 		nominal<br/>
 		date<br/>
 		
@@ -549,9 +549,10 @@ SchemaCompatibility
   		<p>
 		
 		productId<br/>
+		<span style="text-decoration: line-through">quantity</span><br/>
 		nominal<br/>
 		date<br/>
-		<span style="color: red">tradingPlace</span><br/>
+		<span style="font-weight: bold; background-color: white; color: black">tradingPlace</span><br/>
 	</p>
 	</div>
 </section>
