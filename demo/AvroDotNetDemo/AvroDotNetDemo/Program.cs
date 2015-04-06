@@ -51,8 +51,6 @@ namespace AvroDotNetDemo
                     while (true)
                     {
                         Thread.Sleep(100);
-                        //var msg = socket.ReceiveString();
-                        //Console.Out.WriteLine(msg);
                         var msg = socket.Receive();
                         var stream = new MemoryStream(msg);
                         var trade = deserializer.Deserialize(stream);
