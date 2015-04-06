@@ -13,10 +13,7 @@ import java.util.concurrent.TimeUnit;
 import static org.apache.avro.SchemaCompatibility.SchemaCompatibilityType;
 import static org.apache.avro.SchemaCompatibility.SchemaCompatibilityType.COMPATIBLE;
 
-/**
- * Hello world!
- *
- */
+
 public class TradeProvider
 {
     public static final Schema TRADE_SCHEMA = new Schema.Parser().parse("{\n" +
